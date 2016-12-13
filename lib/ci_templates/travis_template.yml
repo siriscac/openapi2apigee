@@ -10,4 +10,6 @@ before_script:
   - gulp deploy-test
 script:
   - npm test
+after_success:
   - gulp deploy-prod
+  - gulp update-devportal

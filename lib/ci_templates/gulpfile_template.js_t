@@ -1,28 +1,65 @@
 var gulp = require('gulp');
 var zip = require('gulp-zip');
 var apigeetool = require('apigeetool');
+var request = require('request');
+var YAML = require('yamljs');
+
+var swagger = require('./swagger.json');
 
 var PROXY_NAME = 'openbank-ci-demo';
 var opts = {
     organization: process.env.org,
-    username: process.env.username,
-    password: process.env.password,
-    api: PROXY_NAME,
-    directory: 'develop'
+	username: process.env.username,
+	password: process.env.password,
+	api: PROXY_NAME,
+	directory: 'develop'
+};
+var model = {
+	name: "",
+	displayName: "",
+	description: ""
 };
 
 gulp.task('deploy-test', function() {
-    opts.environments = process.env.env_test;
-    return apigeetool.getPromiseSDK().deployProxy(opts);
+	opts.environments = process.env.env_test;
+	return apigeetool.getPromiseSDK().deployProxy(opts);
 });
 
 gulp.task('deploy-prod', function() {
-    opts.environments = process.env.env_test;
-    return apigeetool.getPromiseSDK().deployProxy(opts);
+	opts.environments = process.env.env_prod;
+	return apigeetool.getPromiseSDK().deployProxy(opts);
 });
 
 gulp.task('build', () => {
     return gulp.src('develop/apiproxy/*')
         .pipe(zip('apiproxy.zip'))
         .pipe(gulp.dest('build'));
+});
+
+gulp.task('update-devportal', function(){
+	var auth = 'Basic ' + new Buffer(process.env.username + ":" + process.env.password).toString('base64');
+
+	//https://:host/v1/organizations/:org/apimodels
+	request.post({
+		headers: {'authorization': auth, 'content-type': 'application/json'},
+		uri: 'https://api.enterprise.apigee.com/v1/organizations/' + process.env.org + '/apimodels',
+		body: JSON.stringify(model)
+	}, function(error, response, body){
+		var modelBodyParsed = JSON.parse(body);
+		if(modelBodyParsed.id){
+			console.info('ID:' + modelBodyParsed.id);
+		} else {
+			console.info(modelBodyParsed.message)
+		}
+		//https://:host/v1/organizations/:org/apimodels/:models/import/file?format=swagger
+		request.post({
+			headers: {'authorization': auth, 'content-type': 'application/yaml'},
+			uri: 'https://api.enterprise.apigee.com/v1/organizations/' + process.env.org + '/apimodels/' + model.name + '/import/file?format=swagger',
+			body: YAML.stringify(swagger, 4)
+		}, function(error, response, body){
+			var bodyParsed = JSON.parse(body);
+	 	   	console.info('ID: ' + bodyParsed.id + ', Revision:' + bodyParsed.revisionNumber);
+			return body;
+		});
+	});
 });
