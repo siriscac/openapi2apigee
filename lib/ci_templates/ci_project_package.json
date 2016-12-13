@@ -1,0 +1,17 @@
+{
+  "name": "apigee-ci-project",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "mocha tests"
+  },
+  "dependencies": {
+    "apigeetool": "^0.6.6",
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "supertest": "^2.0.1"
+  },
+  "devDependencies": {
+    "gulp-zip": "^3.2.0"
+  }
+}
