@@ -32,14 +32,19 @@
   "dependencies": {
     "apigeetool": "0.6.6",
     "async": "^2.1.2",
+    "chai": "^3.5.0",
     "commander": "^2.8.1",
+    "dotenv": "^2.0.0",
     "easy-zip": "0.0.4",
     "inquirer": "1.2.3",
     "lodash.assign": "4.2.0",
     "lodash.omit": "4.5.0",
-    "mkdirp": "0.5.1",
+    "mkdirp": "^0.5.1",
+    "open-api-test-generator": "^0.1.5",
     "stream-from-array": "1.0.0",
+    "supertest": "^2.0.1",
     "swagger-parser": "3.4.1",
+    "swagger-test-templates": "^1.3.0",
     "xmlbuilder": "8.2.2"
   },
   "devDependencies": {
